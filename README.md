@@ -1,5 +1,5 @@
 # 记录下在虚拟机上配置MYSQL主从配置(曲折之路)的过程
-==========================
+
 ## 测试主从服务器是否生效，将做个选择性批量替换数据表敏感数据的PHP项目,该项目将采用LNMP方式运行，尝试使用Laravel5.1+Angular.js搭建后台
   首先选用VirtualBox 5.1.14虚拟机安装第一台Ubuntu服务器(x64,版本14.04)，名字叫 Ubuntu-Server-x64-master,安装过程就不详细说明，
   安装mysql5.6数据库可参考(https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-14-04 和 http://blog.chinaunix.net/uid-23284114-id-5520029.html ),要说明的是如何主机如何和虚拟机互相访问：
@@ -31,6 +31,7 @@ sudo ifdown --exclude=lo -a && sudo ifup --exclude=lo -a 重启除lo网卡的所
 按上面配置网络那样配置第二台虚拟主机，主要是host-only网络的IP不一样，其他全一样。
 这样两条虚拟主机就可以互相访问了。
 
+___
 
 ## 接下来配置虚拟机里mysql和防火墙 让宿主主机能访问虚拟机上的mysql数据库
 打开/etc/mysql/my.cnf
@@ -63,6 +64,8 @@ tcp6       0      0 192.168.56.101:mysql    192.168.56.1:56056      ESTABLISHED 
 或者
 sudo lsof -i :3306
 查看3306端口被哪个程序占用
+
+___
 
 ## 记录下连接mysql遇到的问题：
 ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)

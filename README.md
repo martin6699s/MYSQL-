@@ -74,16 +74,18 @@ sudo service mysql stop ,sudo service mysql start下又好了。
 
 ##  NAT+host-only方式：
 两虚拟机之间能互相ping通，走的时NAT,但mysql死活无法远程连接(后续再弄清楚)，只能采用桥接方式+host-only方式或者内部网络+host-only方式，我选了内部网络+host-only方式。
-1. 首先设置虚拟机dhcp,在宿主主机的命令行上 输入：vboxmanage dhcpserver add --netname testlab --ip 10.10.10.1 --netmask 255.255.255.0 --lowerip 10.10.10.2 --upperip 10.10.10.255 --enable
-(http://askubuntu.com/questions/623583/how-can-i-setup-an-internal-network-with-virtualbox-ubuntu-14-04)
-
-这样就开启一个dhcp服务器的内部网络(名字叫testlab,这个后面在设置虚拟机网络名(界面名称)时会用到)
+1. 首先设置虚拟机dhcp,在宿主主机的命令行上 输入：
+```
+vboxmanage dhcpserver add --netname testlab --ip 10.10.10.1 --netmask 255.255.255.0 --lowerip 10.10.10.2 --upperip 10.10.10.255 --enable
+```
+这样就开启一个dhcp服务器的内部网络(名字叫testlab,这个后面在设置虚拟机网络名(界面名称)时会用到),可参考[需要翻墙链接](http://askubuntu.com/questions/623583/how-can-i-setup-an-internal-network-with-virtualbox-ubuntu-14-04)
 2. 选择第一台虚拟机主机,点击设置 --> 选择网络 --> 网卡1，把刚才设置成‘NAT’连接方式成‘内部网络’连接方式，然后界面名称就输入刚才的网络名'testlab',这是第一块网卡eth0配置
 3. 选择第二台虚拟主机，重复步骤(2)
-4. 同时启动两台虚拟机，因为之前两台虚拟机的第一块网卡都在/etc/network/interfaces文件里面加了
+4. 同时启动两台虚拟机，因为之前两台虚拟机的第一块网卡都在/etc/network/interfaces文件里面加了(没有的自行加上)
+```
 auto eth0 
 iface lo inet dhcp
-没有的自行加上。
+```
 5. 因为两个虚拟机都在10.10.10.x网段上，dhcp自动分给了第一台‘10.10.10.2’ IP地址，第二台为‘10.10.10.3’ IP地址，通过ifconfig可以看到。然后就需要我们在重复上面的设置mysql中的my.cnf和刷权限，防火墙之前开放3306端口，没开的请重新开。最后通过lsof -i :3306 或netstat 看有没有绑定IP和端口。
 这里建议在主从mysql数据库上新建一个用户如‘user’及对应的密码如'xxxxxx'，用该用户远程登录虚拟机mysql
 6. 记得对两个虚拟机做个快照。

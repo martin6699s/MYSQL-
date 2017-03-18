@@ -2,9 +2,10 @@
 
 ## 首先需要安装virtualBox虚拟机增强工具
 1. 在virtualBox中的虚拟机的菜单栏选 Devices(设备) --> insert Guest Additions CD image(安装增强工具)，这是在虚拟机设置-存储-控制器:IDE就有挂了虚拟机增强工具的镜像。
-2. 然后打开虚拟机，输入 cd /mnt/cdrom(如果没有该目录 请sudo mkdir /mnt/cdrom),这个目录用于挂载CD介质，现在开始挂载：sudo mount -t iso9660 /dev/cdrom /mnt/cdrom
+2. 然后打开虚拟机，输入 cd /mnt/cdrom(如果没有该目录 请sudo mkdir /mnt/cdrom),这个目录用于挂载CD介质，现在开始挂载：`sudo mount -t iso9660 /dev/cdrom /mnt/cdrom`
 3. 在进入/mnt/cdrom 看到里面有很多文件，其中VBoxLinuxAdditions.run;
-4. 输入sh ./VBoxLinuxAdditions.run,报错误：
+4. 输入`sh ./VBoxLinuxAdditions.run`,报错误：
+```
 martin@xxx:/mnt/cdrom$ sudo sh ./VBoxLinuxAdditions.run
 Verifying archive integrity... All good.
 Uncompressing VirtualBox 5.1.14 Guest Additions for Linux...........
@@ -16,10 +17,11 @@ vboxadd.sh: You should restart your guest to make sure the new modules are actua
 vboxadd.sh: Starting the VirtualBox Guest Additions.
 
 Could not find the X.Org or XFree86 Window System, skipping.
-
+```
 因为Ubuntu server没有安装Xwindow，运行安装 `sudo apt-get install xserver-xorg xserver-xorg-core`
 
-5. 再次执行 sudo sh ./VBoxLinuxAdditions.run
+5. 再次执行 `sudo sh ./VBoxLinuxAdditions.run`
+```
 martin@xxx:/mnt/cdrom$ sudo sh ./VBoxLinuxAdditions.run
 Verifying archive integrity... All good.
 Uncompressing VirtualBox 5.1.14 Guest Additions for Linux...........
@@ -32,14 +34,15 @@ Installing additional modules ...
 vboxadd.sh: Building Guest Additions kernel modules.
 vboxadd.sh: You should restart your guest to make sure the new modules are actually used.
 vboxadd.sh: Starting the VirtualBox Guest Additions.
-
 You may need to restart the Window System (or just restart the guest system)
 to enable the Guest Additions.
+```
+
 安装完成。其他问题引起无法安装增强工具可以参考(内含ubuntu 安装)：[链接](http://limitx5.blogspot.hk/2016/04/openmpi-virtualbox-50-ubuntu-server-x64.html)
 
 6. 关闭虚拟机，在设置-存储-控制器:IDE 删除掉增强工具的iso镜像，点确定。(养成好习惯 把没用的镜像去掉)
 7. 在设置-共享文件夹-添加共享文件夹-选择宿主主机里的路径，共享文件夹名称填Documents, 这是你要挂载的文件夹名，选自动挂载，开启虚拟机，
-在进入`~`家目录，mkdir Work,然后开始挂载共享文件夹：sudo mount -t vboxsf Documents /home/martin/Work 。这是就能看到/home/martin/Work目录里面有宿主主机Documents共享文件夹的资源了。
+在进入`~`家目录，mkdir Work,然后开始挂载共享文件夹：`sudo mount -t vboxsf Documents /home/martin/Work` 。这是就能看到/home/martin/Work目录里面有宿主主机Documents共享文件夹的资源了。
 说明 ：`sudo mount -t vboxsf share mount_point`
  -t表示指明是哪个文件系统类型，share就是我们刚才在virtualBox设置共享文件夹填的共享文件夹名，mount_point就是在ubuntu操作系统里面挂载的文件夹绝对路径。
 

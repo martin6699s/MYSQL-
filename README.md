@@ -10,7 +10,7 @@
     host-only模式 顾名思义就是只有宿主主机和虚拟机主机之间互访模式。
 
 
-## 我选用NAT+host-only，那么久需要配置两张虚拟网卡(优点:虚拟机能用host-only与宿主主机连接，用NAT与外网连接，缺点：宿主主机与通NAT下的IP无法连接)
+## 我选用NAT+host-only，那么久需要配置两张虚拟网卡(优点:虚拟机能用host-only与宿主主机连接，用NAT与外网连接，缺点：宿主主机与NAT下的IP无法连接)
 首先设置NAT: 在VirtualBox菜单栏选VirtualBox -> 偏好设置 ->  网络 -> NAT网络 -> 右边有添加NAT网络按钮-> 添加后双击该网络(通常的命名为NatNetwork) -> 确保“启动网络  通常网络为10.0.2.0/24,支持DHCP”->  回到Ubuntu Server 虚拟机 选该虚拟机并点“设置”-> 网络 -> 网卡1选网络地址转换(NAT) -> 进入虚拟机Ubuntu ->  cat /etc/network/interfaces 查看第一块网卡eth0在该文件中，我的interfaces文件上显示iface eth0 inet dhcp -> 完成
 设置host-only: 在VirtualBox菜单栏选VirtualBox -> 偏好设置 ->  网络 -> 选仅主机(Host-Only)模式,之后它帮我创建了vboxnet0网络 -> 双击vboxnet0-> 配置主机虚拟网络IPv4地址为192.168.56.1/24 -> 单机DHCP服务器，启动服务器，添服务器地址192.168.56.100/24, 最小最大地址都添192.168.56.101好了，一个就行 -> 回到Ubuntu Server 虚拟机 选该虚拟机并点“设置”-> 网络 -> 网卡2选择host-only连接模式，界面名称选vboxnet0,高级下控制芯片我选Intel PRO/1000 MT -> 进入虚拟机Ubuntu ->  vim /etc/network/interfaces 我的interfaces文件里加入
 ## VirtualBox Host-only mode
@@ -55,14 +55,17 @@ sudo ufw allow 3306/tcp
 到这里要注意不能在去刷udo mysql_secure_installation，不然又得重来(1);
 另外sudo ufw delete allow 3306/tcp就是静止端口
 查看mysql监听端口：
+```
 martin@xxx:~$ netstat -tap | grep mysql
 (No info could be read for "-p": geteuid()=1000 but you should be root.)
 tcp6       0      0 [::]:mysql              [::]:*                  LISTEN      -
 tcp6       0      0 192.168.56.101:mysql    192.168.56.1:56055      ESTABLISHED -
 tcp6       0      0 192.168.56.101:mysql    192.168.56.1:56056      ESTABLISHED -
-
+```
 或者
+```
 sudo lsof -i :3306
+```
 查看3306端口被哪个程序占用
 
 ___
@@ -72,7 +75,7 @@ ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run
 有一次莫名其妙启动虚拟机，mysql -uroot -pxxx 连接本地数据库报出上面错误，看了stackoverflow，可能是配置出错导致，/var/run/mysqld/mysqld.sock的产生在my.cnf里，看了下配置来bind-address时没有该IP地址，才想起来曾经改过虚拟机静态IP;改成虚拟机IP后，
 sudo service mysql stop ,sudo service mysql start下又好了。
 
-##  NAT+host-only方式：
+##  内部网络+host-only方式：
 两虚拟机之间能互相ping通，走的时NAT,但mysql死活无法远程连接(后续再弄清楚)，只能采用桥接方式+host-only方式或者内部网络+host-only方式，我选了内部网络+host-only方式。
 1. 首先设置虚拟机dhcp,在宿主主机的命令行上 输入：
 ```

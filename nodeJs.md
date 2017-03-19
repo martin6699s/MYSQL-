@@ -28,8 +28,10 @@ sudo apt-get update
 下载速度瞬间飞起来！
 
 因为我的Ubuntu是14.04 LTS 推荐安装Node.js v.4x
+```
 curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -  
 sudo apt-get install -y nodejs 
+```
 
 安装成功！查看nodejs -v 和 npm -v 
 分别是v4.8.0 和 v2.5.11 

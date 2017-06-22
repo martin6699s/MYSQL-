@@ -118,45 +118,48 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
     运行install后报错如下：
 
       ```
-Problem 1
-    - Installation request for phpunit/phpunit 4.8.35 -> satisfiable by phpunit/phpunit[4.8.35].
-    - phpunit/phpunit 4.8.35 requires ext-dom * -> the requested PHP extension dom is missing from your system.
+      Problem 1
+        - Installation request for phpunit/phpunit 4.8.35 -> satisfiable by phpunit/phpunit[4.8.35].
+        - phpunit/phpunit 4.8.35 requires ext-dom * -> the requested PHP extension dom is missing from your system.
 
-  To enable extensions, verify that they are enabled in your .ini files:
-    - /etc/php/7.0/cli/php.ini
-    - /etc/php/7.0/cli/conf.d/10-mysqlnd.ini
-    - /etc/php/7.0/cli/conf.d/10-opcache.ini
-    - /etc/php/7.0/cli/conf.d/10-pdo.ini
-    - /etc/php/7.0/cli/conf.d/20-calendar.ini
-    - /etc/php/7.0/cli/conf.d/20-ctype.ini
-    - /etc/php/7.0/cli/conf.d/20-curl.ini
-    - /etc/php/7.0/cli/conf.d/20-exif.ini
-    - /etc/php/7.0/cli/conf.d/20-fileinfo.ini
-    - /etc/php/7.0/cli/conf.d/20-ftp.ini
-    - /etc/php/7.0/cli/conf.d/20-gd.ini
-    - /etc/php/7.0/cli/conf.d/20-gettext.ini
-    - /etc/php/7.0/cli/conf.d/20-iconv.ini
-    - /etc/php/7.0/cli/conf.d/20-json.ini
-    - /etc/php/7.0/cli/conf.d/20-mbstring.ini
-    - /etc/php/7.0/cli/conf.d/20-mcrypt.ini
-    - /etc/php/7.0/cli/conf.d/20-mysqli.ini
-    - /etc/php/7.0/cli/conf.d/20-pdo_mysql.ini
-    - /etc/php/7.0/cli/conf.d/20-phar.ini
-    - /etc/php/7.0/cli/conf.d/20-posix.ini
-    - /etc/php/7.0/cli/conf.d/20-readline.ini
-    - /etc/php/7.0/cli/conf.d/20-shmop.ini
-    - /etc/php/7.0/cli/conf.d/20-sockets.ini
-    - /etc/php/7.0/cli/conf.d/20-sysvmsg.ini
-    - /etc/php/7.0/cli/conf.d/20-sysvsem.ini
-    - /etc/php/7.0/cli/conf.d/20-sysvshm.ini
-    - /etc/php/7.0/cli/conf.d/20-tokenizer.ini
-  You can also run `php --ini` inside terminal to see which files are used by PHP in CLI mode.
-      ```
+          To enable extensions, verify that they are enabled in your .ini files:
+        - /etc/php/7.0/cli/php.ini
+        - /etc/php/7.0/cli/conf.d/10-mysqlnd.ini
+        - /etc/php/7.0/cli/conf.d/10-opcache.ini
+        - /etc/php/7.0/cli/conf.d/10-pdo.ini
+        - /etc/php/7.0/cli/conf.d/20-calendar.ini
+        - /etc/php/7.0/cli/conf.d/20-ctype.ini
+        - /etc/php/7.0/cli/conf.d/20-curl.ini
+        - /etc/php/7.0/cli/conf.d/20-exif.ini
+        - /etc/php/7.0/cli/conf.d/20-fileinfo.ini
+        - /etc/php/7.0/cli/conf.d/20-ftp.ini
+        - /etc/php/7.0/cli/conf.d/20-gd.ini
+        - /etc/php/7.0/cli/conf.d/20-gettext.ini
+        - /etc/php/7.0/cli/conf.d/20-iconv.ini
+        - /etc/php/7.0/cli/conf.d/20-json.ini
+        - /etc/php/7.0/cli/conf.d/20-mbstring.ini
+        - /etc/php/7.0/cli/conf.d/20-mcrypt.ini
+        - /etc/php/7.0/cli/conf.d/20-mysqli.ini
+        - /etc/php/7.0/cli/conf.d/20-pdo_mysql.ini
+        - /etc/php/7.0/cli/conf.d/20-phar.ini
+        - /etc/php/7.0/cli/conf.d/20-posix.ini
+        - /etc/php/7.0/cli/conf.d/20-readline.ini
+        - /etc/php/7.0/cli/conf.d/20-shmop.ini
+        - /etc/php/7.0/cli/conf.d/20-sockets.ini
+        - /etc/php/7.0/cli/conf.d/20-sysvmsg.ini
+        - /etc/php/7.0/cli/conf.d/20-sysvsem.ini
+        - /etc/php/7.0/cli/conf.d/20-sysvshm.ini
+        - /etc/php/7.0/cli/conf.d/20-tokenizer.ini
+      You can also run `php --ini` inside terminal to see which files are used by PHP in CLI mode.
+
+     ```
+
     原来是缺少php7.0-xml扩展，安装:
-    `sudo apt-get install php7.0-xml`
-    `sudo service nginx restart`
+    ```
+    sudo apt-get install php7.0-xml
+    sudo service nginx restart
     然后在composer install
-
+    ```
     * 修改sock访问权限:
 
       打开/etc/php/7.0/fpm/pool.d/www.conf, 把下面的注释去掉:

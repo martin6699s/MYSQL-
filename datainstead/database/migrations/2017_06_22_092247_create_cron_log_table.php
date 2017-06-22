@@ -12,7 +12,7 @@ class CreateCronLogTable extends Migration
      */
     public function up()
     {
-        Schema::table('cron_log', function (Blueprint $table) {
+        Schema::create('cron_log', function (Blueprint $table) {
             //
             $table->engine = 'InnoDB';
             $table->increments('id');
@@ -30,8 +30,6 @@ class CreateCronLogTable extends Migration
      */
     public function down()
     {
-        Schema::table('cron_log', function (Blueprint $table) {
-            //
-        });
+        Schema::drop('cron_log');
     }
 }

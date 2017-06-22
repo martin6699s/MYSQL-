@@ -18,7 +18,7 @@ class CreateCronLogTable extends Migration
             $table->increments('id');
             $table->string('log_name')->nullable();
             $table->string('content');
-            $table->timestamp();
+            $table->timestamps();
 
         });
     }

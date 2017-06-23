@@ -73,11 +73,11 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
 
      `sudo apt-get install zip unzip`
 
-    * 安装git(然后把github上的laravel项目克隆下来)
+   * 安装git(然后把github上的laravel项目克隆下来)
     
      `sudo apt-get install git`
     
-    * 生成公钥并上传到github上
+   * 生成公钥并上传到github上
 
       ```
       mkdir ~/.ssh
@@ -109,16 +109,15 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
       sudo chown -R :www-data /var/www/master-slave/datainstead
       sudo chmod -R 775 /var/www/master-slave/datainstead/storage  
       ```
-
     * 导入laravel项目vendor目录
-    ```
-     cd /var/www/master-slave/datainstead
-     composer install
-    ```
-    运行install后报错如下：
+      ```
+      cd /var/www/master-slave/datainstead
+      composer install
+      ```
+       运行install后报错如下：
 
       ```
-      Problem 1
+       Problem 1
         - Installation request for phpunit/phpunit 4.8.35 -> satisfiable by phpunit/phpunit[4.8.35].
         - phpunit/phpunit 4.8.35 requires ext-dom * -> the requested PHP extension dom is missing from your system.
 
@@ -150,16 +149,16 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
         - /etc/php/7.0/cli/conf.d/20-sysvsem.ini
         - /etc/php/7.0/cli/conf.d/20-sysvshm.ini
         - /etc/php/7.0/cli/conf.d/20-tokenizer.ini
-      You can also run `php --ini` inside terminal to see which files are used by PHP in CLI mode.
+        You can also run `php --ini` inside terminal to see which files are used by PHP in CLI mode.
 
-     ```
+      ```
 
-    原来是缺少php7.0-xml扩展，安装:
-    ```
-    sudo apt-get install php7.0-xml
-    sudo service nginx restart
-    然后在composer install
-    ```
+      原来是缺少php7.0-xml扩展，安装:
+      ```
+      sudo apt-get install php7.0-xml
+      sudo service nginx restart
+      然后在composer install
+      ```
     * 修改sock访问权限:
 
       打开/etc/php/7.0/fpm/pool.d/www.conf, 把下面的注释去掉:
@@ -174,7 +173,7 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
 
       重启nginx
 
-     * 开启调试模式及生成key
+    *  开启调试模式及生成key
        打开项目目录下config/app.php修改：'debug' => env('APP_DEBUG', true),原本为'debug' => env('APP_DEBUG', false) 
 
        在终端使用命令:
@@ -186,4 +185,4 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
 
        然后把app key配置放在.env 
       
-      * 浏览器访问192.168.56.101, 访问是否成功。
+    *  浏览器访问192.168.56.101, 访问是否成功。

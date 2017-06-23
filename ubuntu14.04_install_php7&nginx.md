@@ -90,20 +90,15 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
 
       ssh-add ~/.ssh/私钥
       ```
-    *  克隆laravel项目
+    * 克隆laravel项目
 
-      ```
-      cd /var
-
-      sudo mkdir www
-
-      cd www
-
-      sudo chown -R  当前用户名:当前用户组 /var/www/
-
-      git clone git@github.com:martin6699s/MYSQL-Master-And-Slave-Server-Configuration.git master-slave
-
-      ``` 
+       ```
+       cd /var
+       sudo mkdir www
+       cd www
+       sudo chown -R  当前用户名:当前用户组 /var/www/
+       git clone git@github.com:martin6699s/MYSQL-Master-And-Slave-Server-Configuration.git master-slave
+       ``` 
     * 修改laravel项目的访问权限
       ```
       sudo chown -R :www-data /var/www/master-slave/datainstead
@@ -167,8 +162,9 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
       listen.group = www-data
       listen.mode = 0660
       ```
+      ```
       sudo service php7.0-fpm restart
-
+      ```
       修改nginx.conf中user为 www-data www-data
 
       重启nginx
@@ -177,7 +173,9 @@ Zend Engine v3.0.0, Copyright (c) 1998-2017 Zend Technologies
        打开项目目录下config/app.php修改：'debug' => env('APP_DEBUG', true),原本为'debug' => env('APP_DEBUG', false) 
 
        在终端使用命令:
+       ```
        php artisan key:generate
+       ```
        将生成的key复制到config/app.php替换的APP_KEY键值。
 
        把/var/www/master-slave/datainstead目录下， 把复制.env.example 粘贴重命名成.env 

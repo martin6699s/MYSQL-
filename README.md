@@ -232,9 +232,10 @@ sudo iptables -D INPUT 3
         | data-mysql-bin.000004 |      120 | datainstead  | mysql            |                   |
         +-----------------------+----------+--------------+------------------+-------------------+
       ```
-      
+   3. 复制主库数据库到从库
+        
 
-   3. 配置从服务器Slave:
+   4. 配置从服务器Slave:
 
        修改Slave配置文件 (ubuntu系统下mysql的配置文件: /etc/mysql/my.cnf)
 
@@ -282,7 +283,7 @@ sudo iptables -D INPUT 3
             .....
        ```
 
-    4. 常见语句
+    5. 常见语句
        ```
         show master status; # 查看master的状态, 尤其是当前的二进制日志及位置
         show slave status;  # 查看slave的状态.

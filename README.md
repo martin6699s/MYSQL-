@@ -58,12 +58,15 @@ mysql授权远程登录数据库，参考某博客的[原文链接](https://my.o
 ```
 grant all privileges on *.* to 'root'@'%' identified by 'password' with grant option;
 ```
-3. 刷新权限 `flush privileges;` （ps: 查看mysql权限 mysql> SELECT user, host,select_priv, insert_priv, update_priv,delete_priv from mysql.user;）
+3. 刷新权限 `flush privileges;` 
+  （ps: 查看mysql权限 `mysql> SELECT user, host,select_priv, insert_priv, update_priv,delete_priv from mysql.user;`）
+
 4. exit;退出mysql后，查看防火墙是否开启：
    `sudo ufw status`
+
 5. 显示"Status: inactive", 说明防火墙已启动，通过以下命令开启3306端口
 `sudo ufw allow 3306/tcp`
-到这里要注意不能在去刷udo mysql_secure_installation，不然又得重来(1);
+到这里要注意不能在去刷 `sudo mysql_secure_installation`，不然又得重来(1);
 另外 `sudo ufw delete allow 3306/tcp` 就是静止端口
 查看mysql监听端口：
 ```
@@ -82,9 +85,9 @@ sudo lsof -i :3306
 ___
 
 ## 记录下连接mysql遇到的问题：
-ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
-有一次莫名其妙启动虚拟机，mysql -uroot -pxxx 连接本地数据库报出上面错误，看了stackoverflow，可能是配置出错导致，/var/run/mysqld/mysqld.sock的产生在my.cnf里，看了下配置来bind-address时没有该IP地址，才想起来曾经改过虚拟机静态IP;改成虚拟机IP后，
-sudo service mysql stop ,sudo service mysql start下又好了。
+`ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)`
+有一次莫名其妙启动虚拟机，mysql -uroot -pxxx 连接本地数据库报出上面错误，看了stackoverflow，可能是配置出错导致，`/var/run/mysqld/mysqld.sock`的产生在my.cnf里，看了下配置来bind-address时没有该IP地址，才想起来曾经改过虚拟机静态IP;改成虚拟机IP后，
+`sudo service mysql stop ,sudo service mysql start`下又好了。
 
 ##  内部网络+host-only方式：
 两虚拟机之间能互相ping通，走的时NAT,但mysql死活无法远程连接(后续再弄清楚)，只能采用桥接方式+host-only方式或者内部网络+host-only方式，我选了内部网络+host-only方式。
@@ -178,8 +181,81 @@ COMMIT
 sudo iptables -D INPUT 3
 ```
  
+## 开始配置主从配置
 
 
+### 具体操作
+    1. 修改Master配置文件 (ubuntu系统下mysql的配置文件: /etc/mysql/my.cnf)
+
+       vim /etc/my.cnf
+
+       ```
+       [mysqld]
+       server-id=2                # 设置server_id,一般设置为IP
+
+       binlog-do-db=datainstead   # 复制过滤：需要备份的数据库，输出binlog
+
+       binlog-ignore-db=mysql     # 复制过滤：不需要备份的数据库，不输出(mysql库一般不同步)
+
+       sync_binlog=1            # 主从复制时的事务安全
+
+       log-bin=data-mysql-bin # 开启二进制日志功能，可以随便取，最好有含义
+    
+       binlog_cache_size=1M       # 为每个session分配内存，在事务过程中国用存储二进制日志的缓存
+
+       binlog_format=mixed        # 主从复制的格式(mixed, statement, row, 默认格式是statement)
+       
+       expire_logs_days=7         # 二进制日志自动删除／过期的天数。 默认值为0， 表示不自动删除。
+
+       slave_skip_errors=1032,1062     # 跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断。1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致
+
+       ```
+   2. 在Master主机的msyql上赋予从服务器相权限:
+
+      ```
+       mysql> grant replication slave on *.* to 'martin'@'10.10.10.3' identified by '123456';
+       mysql> flush privileges;
+
+       mysql> show master status; ## 查看position号,记下position号
+
+       mysql> show master status;
+        +-----------------------+----------+--------------+------------------+-------------------+
+        | File                  | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
+        +-----------------------+----------+--------------+------------------+-------------------+
+        | data-mysql-bin.000004 |      120 | datainstead  | mysql            |                   |
+        +-----------------------+----------+--------------+------------------+-------------------+
+      ```
+      
+
+   3. 配置从服务器Slave:
+
+       修改Slave配置文件 (ubuntu系统下mysql的配置文件: /etc/mysql/my.cnf)
+
+        `vim /etc/my.cnf`
+
+       ```
+       [mysqld]
+       server-id=3                # 设置server_id,一般设置为IP
+       log-bin=data-mysql-bin    # 开启二进制日志功能，单主从不用开启
+
+       ```
+
+      ```
+      mysql> change master to master_host='10.10.10.2', master_user='martin', master_password='123456', master_port=3306, master_log_file='data-mysql-bin.000004', master_log_pos=120, master_connect_retry=30;
+      mysql> start slave;    #启动从服务器复制功能
+      ```
+      上面执行的命令的解释：
+      ```
+      master_host='192.168.56.101'             ## Master的IP地址
+      master_user='martin'                     ## 用于同步数据的用户（在Master中授权的用户）
+      master_password='123456'                 ## 同步数据用户的密码
+      master_port=3306                         ## Master数据库服务的端口
+      master_log_file='data-mysql-bin.000004'  ## 指定Slave从哪个日志文件开始读复制数据（可在Master上使用show master status查看到日志文件名）
+      master_log_pos=120                       ## 从哪个POSITION号开始读
+      master_connect_retry=30                  ## 当重新建立主从连接时，如果连接建立失败，间隔多久后重试。单位为秒，默认设置为60秒，同步延迟调优参数。
+      ```
+      查看主从同步状态
+       `mysql> show slave status\G;`
 
 
 

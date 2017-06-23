@@ -30,8 +30,10 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('inspire')
 //                 ->hourly();
 
+        // 每分钟执行一次
         $schedule->command('cronlog:insert')
                  ->cron('* * * * *');
+        // 每两分钟执行一次
         $schedule->command('cronlog:delete')
                  ->cron('*/2 * * * *');
 

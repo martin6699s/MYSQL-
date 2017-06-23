@@ -1,6 +1,6 @@
 # 记录下在虚拟机上配置MYSQL主从配置(曲折之路)的过程
 
-## 测试主从服务器是否生效，将做个选择性批量替换数据表敏感数据的PHP项目,该项目将采用LNMP方式运行，尝试使用Laravel5.1+Angular.js搭建后台
+## 测试主从服务器是否生效，将做个定时插入删除调度器,该项目将采用LNMP方式运行，尝试使用Laravel5.1搭建后台服务
   首先选用VirtualBox 5.1.14虚拟机安装第一台Ubuntu服务器(x64,版本14.04)，名字叫 Ubuntu-Server-x64-master,安装过程就不详细说明，
   安装mysql5.6数据库可参考
 [链接1](https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-14-04)
@@ -183,6 +183,13 @@ sudo iptables -D INPUT 3
  
 ## 开始配置主从配置
 
+### MySQL主从复制的方式
+#### MySQL5.6开始主从复制有两种方式：基于日志（binlog）、基于GTID（全局事务标示符）。
+#### 本教程主要讲基于日志（binlog）的复制。
+     MySQL主从复制（也称A/B复制）的原理
+      1. Master将数据改变记录到二进制日志(binary log)中，也就是配置文件log-bin指定的文件，这些记录叫做二进制日志事件(binary log events)；
+      2. Slave通过I/O线程读取Master中的binary log events并写入到它的中继日志(relay log)；
+      3. Slave重做中继日志中的事件，把中继日志中的事件信息一条一条的在本地执行一次，完成数据在本地的存储，从而实现将改变反映到它自己的数据(数据重放)。
 
 ### 具体操作
     1. 修改Master配置文件 (ubuntu系统下mysql的配置文件: /etc/mysql/my.cnf)
@@ -236,7 +243,7 @@ sudo iptables -D INPUT 3
        ```
        [mysqld]
        server-id=3                # 设置server_id,一般设置为IP
-       log-bin=data-mysql-bin    # 开启二进制日志功能，单主从不用开启
+       #log-bin=data-mysql-bin    # 开启二进制日志功能，从库不用开启
 
        ```
 
@@ -256,6 +263,40 @@ sudo iptables -D INPUT 3
       ```
       查看主从同步状态
        `mysql> show slave status\G;`
+
+       ```
+          mysql> show slave status\G;
+         *************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 10.10.10.2
+                  Master_User: martin
+                  Master_Port: 3306
+                Connect_Retry: 30
+              Master_Log_File: data-mysql-bin.000004
+          Read_Master_Log_Pos: 120
+               Relay_Log_File: mysqld-relay-bin.000002
+                Relay_Log_Pos: 288
+        Relay_Master_Log_File: data-mysql-bin.000004
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+            .....
+       ```
+
+    4. 常见语句
+       ```
+        show master status; # 查看master的状态, 尤其是当前的二进制日志及位置
+        show slave status;  # 查看slave的状态.
+        reset slave;        # 重置slave状态.
+        start slave;        # 启动slave状态(一旦启动 则开始监听msater的变化)
+        stop slave;         # 暂停slave状态;
+       ```
+
+## 开始测试
+   在Master主机shell下
+   编辑crontab文件，输入`crontab -e`
+   然后再crontab文件里输入 `* * * * * php /var/www/master-slave/datainstead/artisan schedule:run >> /dev/null 2>&1`
+   保存！开启linux时间调度 laravel定时器
+
 
 
 

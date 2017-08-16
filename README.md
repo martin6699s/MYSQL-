@@ -246,6 +246,7 @@ COMMIT
        ```
        [mysqld]
        server-id=3                # 设置server_id,一般设置为IP
+       sync_relay_log=1           # 确保主从复制时的事务安全 [阿里 . MySQL 半同步复制数据一致性分析](http://mysql.taobao.org/monthly/2017/04/01/)
        #log-bin=data-mysql-bin    # 开启二进制日志功能，从库不用开启
 
        ```
